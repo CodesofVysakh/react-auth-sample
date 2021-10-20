@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Header from "../includes/Header";
 import styled from "styled-components";
 import axios from "axios";
 import { BASE_URL } from "../../axiosConfig";
 import Helmet from "react-helmet";
 import { useParams } from "react-router";
+import { UserContext } from "../../App";
 
 export default function Place() {
     const [place, setPlace] = useState({
         name: "",
         gallery: [],
     });
+
+    const { userData } = useContext(UserContext);
+
     const { id } = useParams();
     useEffect(() => {
         axios

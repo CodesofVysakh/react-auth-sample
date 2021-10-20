@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { UserContext } from "../../App";
 
 function Header() {
+    const { userData, updateUserData } = useContext(UserContext);
+    const handleLogout = () => {
+        updateUserData({ type:"LOGOUT" });
+    }
     return (
         <HeaderContainer>
             <Logo
@@ -10,7 +15,12 @@ function Header() {
                 alt="Logo"
             />
             <RightContainer>
-                <LoginButton>Login</LoginButton>
+                {userData ? (
+                <LoginButton onClick={() => handleLogout()}>Logout</LoginButton>
+
+                ): (
+                <LoginButton to="/auth/login"> Login</LoginButton>
+                )}
             </RightContainer>
         </HeaderContainer>
     );

@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../../axiosConfig";
+import { UserContext } from "../../App";
 
 
 export default function Login() {
+    const { updateUserData } = useContext(UserContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -15,12 +17,13 @@ export default function Login() {
 
     const handleSubmit = (e) => {
         setMessage("");
-        e.preventDefalut();
+        e.preventDefault();
         axios
         .post(`${BASE_URL}/auth/token/`, {username, password})
         .then((response) => {
             let data = response.data;
             localStorage.setItem("user_data", JSON.stringify(data));
+            updateUserData({type: "LOGIN", payload: data})
             history.push("/")
             console.log(response);
         })

@@ -1,8 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
+import { BASE_URL } from "../../axiosConfig";
+import { UserContext } from "../../App";
+
 
 export default function Signup() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
+
+    const { updateUserData } = useContext(UserContext);
+
+    const history = useHistory();
+
+    const handleSubmit = (e) => {
+        setMessage("");
+        e.preventDefault();
+        axios
+        .post(`${BASE_URL}/auth/register/`, {email, password, first_name: name,})
+        .then((response) => {
+            let data = response.data;
+            let status_code = response.data.StatusCode;
+            if(status_code === 6000) {
+                localStorage.setItem("user_data", JSON.stringify(data));
+                updateUserData({type: "LOGIN", payload: data})
+                history.push("/")
+            }else {
+                setMessage(response.data.message);
+
+            }
+            console.log(response);
+        })
+        .catch((error) => {
+            console.log(error.status);
+            if(error.response.status === 401){
+                setMessage(error.response.data.detail);
+            }
+        })
+    }
+
     return (
         <Container>
             <LeftContainer>
@@ -20,18 +59,30 @@ export default function Signup() {
                     <LoginInfo>
                         Create an account to acccess all the features
                     </LoginInfo>
-                    <Form>
+                    <Form onSubmit={handleSubmit}>
                         <InputContainer>
-                            <TextInput type="text" placeholder="Name" />
+                            <TextInput 
+                                onChange={(e) => setName(e.target.value)}
+                                value={name}
+                                type="text"
+                                placeholder="Name" />
                         </InputContainer>
                         <InputContainer>
-                            <TextInput type="email" placeholder="Email" />
+                            <TextInput 
+                                onChange={(e) => setEmail(e.target.value)}
+                                value={email}
+                                type="email"
+                                placeholder="Email" />
                         </InputContainer>
                         <InputContainer>
-                            <TextInput type="password" placeholder="Password" />
+                            <TextInput 
+                                onChange={(e) => setPassword(e.target.value)}
+                                value={password}
+                                type="password"
+                                placeholder="Password" />
                         </InputContainer>
                         <LoginButton to="/auth/login/">Login Now</LoginButton>
-
+                        {message && <ErrorMessage>{message}</ErrorMessage>}
                         <ButtonContainer>
                             <SubmitButton>Create an Account</SubmitButton>
                         </ButtonContainer>
